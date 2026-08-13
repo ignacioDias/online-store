@@ -67,6 +67,21 @@ CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_username ON users(username);
 `
 
+var createNotificationsTable = `CREATE TABLE IF NOT EXISTS notifications (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type VARCHAR(50) NOT NULL,       
+    title VARCHAR(255) NOT NULL,    
+    message TEXT NOT NULL,          
+    metadata JSONB,                   -- data extra según el tipo (ej: order_id)
+    is_seen BOOLEAN DEFAULT FALSE,
+    seen_at TIMESTAMP,                -- cuándo la vio
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_notifications_user_unseen ON notifications(user_id, is_seen);
+`
+
 func (db *Database) Init() error {
 	tx, err := db.DB.Beginx()
 	if err != nil {

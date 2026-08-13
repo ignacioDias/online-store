@@ -1,9 +1,5 @@
 package domains
 
-import (
-	"time"
-)
-
 type User struct {
 	ID             string `db:"id" json:"id"`
 	Username       string `db:"username" json:"username"`
@@ -26,7 +22,5 @@ func NewUser(id, username, name, email, hashedPassword string) *User {
 		HashedPassword: hashedPassword,
 		IsActive:       true,
 		EmailVerified:  false,
-		CreatedAt:      time.Now().Format(time.RFC3339),
-		UpdatedAt:      time.Now().Format(time.RFC3339),
 	}
 }
