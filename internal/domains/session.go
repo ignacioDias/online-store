@@ -2,6 +2,8 @@ package domains
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Session struct {
@@ -11,9 +13,9 @@ type Session struct {
 	ExpiresAt time.Time `json:"expiresAt" db:"expires_at"`
 }
 
-func NewSession(id, userID string) *Session {
+func NewSession(userID string) *Session {
 	return &Session{
-		ID:        id,
+		ID:        uuid.NewString(),
 		UserID:    userID,
 		CreatedAt: time.Now().UTC(),
 		ExpiresAt: time.Now().UTC().Add(30 * time.Minute),
