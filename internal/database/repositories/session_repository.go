@@ -13,9 +13,9 @@ var ErrSessionNotFound = errors.New("Session not found")
 
 type SessionRepository interface {
 	CreateSession(ctx context.Context, session *domains.Session) error
-	FindSessionByID(ctx context.Context, id string) (*domains.Session, error)
+	GetSessionByID(ctx context.Context, id string) (*domains.Session, error)
 	DeleteSessionByID(ctx context.Context, id string) error
-	DeleteSessionsByUserID(ctx context.Context, userID int64) error
+	DeleteSessionsByUserID(ctx context.Context, userID string) error
 }
 
 type sessionRepository struct {
@@ -39,7 +39,7 @@ func (sessRepo *sessionRepository) CreateSession(ctx context.Context, session *d
 	return stmt.GetContext(ctx, session, session)
 }
 
-func (sessRepo *sessionRepository) FindSessionByID(ctx context.Context, id string) (*domains.Session, error) {
+func (sessRepo *sessionRepository) GetSessionByID(ctx context.Context, id string) (*domains.Session, error) {
 	var session domains.Session
 	query := "SELECT id, user_id, created_at, expires_at FROM sessions WHERE id = $1 AND expires_at > (CURRENT_TIMESTAMP AT TIME ZONE 'UTC')"
 	if err := sessRepo.db.GetContext(ctx, &session, query, id); err != nil {
@@ -57,7 +57,7 @@ func (sessRepo *sessionRepository) DeleteSessionByID(ctx context.Context, id str
 	return CheckErrResult(result, err, ErrSessionNotFound)
 }
 
-func (sessRepo *sessionRepository) DeleteSessionsByUserID(ctx context.Context, userID int64) error {
+func (sessRepo *sessionRepository) DeleteSessionsByUserID(ctx context.Context, userID string) error {
 	query := "DELETE FROM sessions WHERE user_id = $1"
 	result, err := sessRepo.db.ExecContext(ctx, query, userID)
 	return CheckErrResult(result, err, ErrSessionNotFound)
