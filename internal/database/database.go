@@ -45,10 +45,27 @@ func NewDatabase(db *sqlx.DB) *Database {
 var createSessionsTable = `
 CREATE TABLE IF NOT EXISTS sessions (
     id TEXT PRIMARY KEY,
-    user_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     expires_at TIMESTAMPTZ NOT NULL
 );`
+
+var createUsersTable = `CREATE TABLE IF NOT EXISTS users (
+    id                UUID PRIMARY KEY,
+    username          VARCHAR(50) UNIQUE NOT NULL,
+    name              VARCHAR(255) NOT NULL,
+    email             VARCHAR(255) UNIQUE NOT NULL,
+    hashed_password   TEXT NOT NULL,
+    profile_picture   TEXT,                         -- URL o path al archivo
+    is_active         BOOLEAN NOT NULL DEFAULT TRUE, -- para soft-disable en vez de borrar
+    email_verified    BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_username ON users(username);
+`
 
 func (db *Database) Init() error {
 	tx, err := db.DB.Beginx()
