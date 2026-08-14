@@ -51,7 +51,7 @@ var createReviewsTable = `CREATE TABLE IF NOT EXISTS reviews (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-    score SMALLINT NOT NULL CHECK (score BETWEEN 1 AND 10),
+    score SMALLINT NOT NULL CHECK (score BETWEEN 1 AND 5),
     comment TEXT,
     image_url TEXT,
     likes INT NOT NULL DEFAULT 0,
@@ -64,7 +64,7 @@ var createShoppingCartTable = `CREATE TABLE IF NOT EXISTS cart_items (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     quantity INT NOT NULL DEFAULT 1 CHECK (quantity > 0),
-    added_at TIMESTAMP DEFAULT NOW(),
+    added_at TIMESTAMPTZ DEFAULT NOW(),
     PRIMARY KEY (user_id, product_id)
 );
 `
@@ -78,6 +78,6 @@ var createAddressesTable = `CREATE TABLE IF NOT EXISTS addresses (
     postal_code VARCHAR(20) NOT NULL,
     country VARCHAR(100) NOT NULL,
     is_default BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 `

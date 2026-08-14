@@ -49,8 +49,5 @@ func (fr *favoriteRepository) GetFavoritesByUserID(ctx context.Context, userID s
 	if err != nil {
 		return nil, fmt.Errorf("select favorites: %w", err)
 	}
-	if len(productIDS) == 0 {
-		return []string{}, nil
-	}
 	return productIDS, nil
 }
