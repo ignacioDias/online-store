@@ -60,3 +60,24 @@ var createReviewsTable = `CREATE TABLE IF NOT EXISTS reviews (
     UNIQUE (user_id, product_id)
 );
 `
+var createShoppingCartTable = `CREATE TABLE IF NOT EXISTS cart_items (
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    quantity INT NOT NULL DEFAULT 1 CHECK (quantity > 0),
+    added_at TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (user_id, product_id)
+);
+`
+var createAddressesTable = `CREATE TABLE IF NOT EXISTS addresses (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    street VARCHAR(255) NOT NULL,        -- "Av. Colón 1234"
+    apartment VARCHAR(50),               -- "Piso 3, depto B" (opcional)
+    city VARCHAR(100) NOT NULL,
+    state VARCHAR(100) NOT NULL,         -- provincia
+    postal_code VARCHAR(20) NOT NULL,
+    country VARCHAR(100) NOT NULL,
+    is_default BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+`
