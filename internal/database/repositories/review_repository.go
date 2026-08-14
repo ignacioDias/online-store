@@ -65,7 +65,7 @@ func (rr *reviewRepository) getReviewsByField(ctx context.Context, field, value 
 	var reviews []*domains.Review
 	err := rr.db.SelectContext(ctx, &reviews, query, value)
 	if err != nil {
-		return nil, err
+		return []*domains.Review{}, err
 	}
 	return reviews, nil
 }

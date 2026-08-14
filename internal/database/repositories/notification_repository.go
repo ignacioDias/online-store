@@ -42,7 +42,9 @@ func (nr *notificationRepository) GetNotificationsByUserID(ctx context.Context, 
 	if err != nil {
 		return nil, fmt.Errorf("select notifications: %w", err)
 	}
-
+	if len(notifications) == 0 {
+		return notifications, ErrNotificationNotFound
+	}
 	return notifications, nil
 }
 

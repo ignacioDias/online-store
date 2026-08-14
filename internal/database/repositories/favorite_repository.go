@@ -47,7 +47,10 @@ func (fr *favoriteRepository) GetFavoritesByUserID(ctx context.Context, userID s
 	var productIDS []string
 	err := fr.db.SelectContext(ctx, &productIDS, query, userID)
 	if err != nil {
-		return nil, fmt.Errorf("select favorites: %w", err)
+		return []string{}, fmt.Errorf("select favorites: %w", err)
+	}
+	if len(productIDS) == 0 {
+		return productIDS, ErrFavoriteNotFound
 	}
 	return productIDS, nil
 }
