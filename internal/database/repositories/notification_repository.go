@@ -27,8 +27,8 @@ func NewNotificationRepository(db *sqlx.DB) NotificationRepository {
 }
 
 func (nr *notificationRepository) CreateNotification(ctx context.Context, notification *domains.Notification) error {
-	query := `INSERT INTO notifications (id, user_id, type, title, message, metadata, is_seen, seen_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
-	_, err := nr.db.ExecContext(ctx, query, notification.ID, notification.UserID, notification.Type, notification.Title, notification.Message, notification.Metadata, notification.IsSeen, notification.SeenAt)
+	query := `INSERT INTO notifications (id, user_id, type, title, message, metadata, is_seen, seen_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING created_at`
+	err := nr.db.GetContext(ctx, &notification.CreatedAt, query, notification.ID, notification.UserID, notification.Type, notification.Title, notification.Message, notification.Metadata, notification.IsSeen, notification.SeenAt)
 	if err != nil {
 		return fmt.Errorf("insert notification: %w", err)
 	}

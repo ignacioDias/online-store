@@ -5,6 +5,7 @@ import (
 	"errors"
 	"regexp"
 	"testing"
+	"time"
 
 	"sports-store/internal/domains"
 
@@ -16,9 +17,9 @@ func TestFavoriteRepositoryAddDuplicate(t *testing.T) {
 	repo := NewFavoriteRepository(db)
 	favorite := domains.NewFavorite("user-1", "product-1")
 
-	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO favorites (user_id, product_id) VALUES ($1, $2) ON CONFLICT (user_id, product_id) DO NOTHING")).
+	mock.ExpectQuery(regexp.QuoteMeta("INSERT INTO favorites (user_id, product_id) VALUES ($1, $2) ON CONFLICT (user_id, product_id) DO NOTHING RETURNING created_at")).
 		WithArgs(favorite.UserID, favorite.ProductID).
-		WillReturnResult(sqlmock.NewResult(0, 0))
+		WillReturnRows(sqlmock.NewRows([]string{"created_at"}))
 
 	if err := repo.AddFavorite(context.Background(), favorite); !errors.Is(err, ErrFavoriteAlreadyExists) {
 		t.Fatalf("error = %v, want ErrFavoriteAlreadyExists", err)
@@ -32,13 +33,17 @@ func TestFavoriteRepositoryAdd(t *testing.T) {
 	db, mock := newMockDB(t)
 	repo := NewFavoriteRepository(db)
 	favorite := domains.NewFavorite("user-1", "product-1")
+	createdAt := time.Now().UTC()
 
-	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO favorites (user_id, product_id) VALUES ($1, $2) ON CONFLICT (user_id, product_id) DO NOTHING")).
+	mock.ExpectQuery(regexp.QuoteMeta("INSERT INTO favorites (user_id, product_id) VALUES ($1, $2) ON CONFLICT (user_id, product_id) DO NOTHING RETURNING created_at")).
 		WithArgs(favorite.UserID, favorite.ProductID).
-		WillReturnResult(sqlmock.NewResult(0, 1))
+		WillReturnRows(sqlmock.NewRows([]string{"created_at"}).AddRow(createdAt))
 
 	if err := repo.AddFavorite(context.Background(), favorite); err != nil {
 		t.Fatalf("AddFavorite returned error: %v", err)
+	}
+	if !favorite.CreatedAt.Equal(createdAt) {
+		t.Fatalf("CreatedAt = %v, want %v", favorite.CreatedAt, createdAt)
 	}
 	if err := mock.ExpectationsWereMet(); err != nil {
 		t.Fatal(err)

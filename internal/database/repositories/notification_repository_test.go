@@ -28,7 +28,7 @@ func TestNotificationRepositoryCreateAndGet(t *testing.T) {
 	notification.SeenAt = &seenAt
 	notification.CreatedAt = seenAt
 
-	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO notifications (id, user_id, type, title, message, metadata, is_seen, seen_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)")).WithArgs(notification.ID, notification.UserID, notification.Type, notification.Title, notification.Message, notification.Metadata, notification.IsSeen, notification.SeenAt).WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectQuery(regexp.QuoteMeta("INSERT INTO notifications (id, user_id, type, title, message, metadata, is_seen, seen_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING created_at")).WithArgs(notification.ID, notification.UserID, notification.Type, notification.Title, notification.Message, notification.Metadata, notification.IsSeen, notification.SeenAt).WillReturnRows(sqlmock.NewRows([]string{"created_at"}).AddRow(seenAt))
 	mock.ExpectQuery(regexp.QuoteMeta("SELECT id, user_id, type, title, message, metadata, is_seen, seen_at, created_at FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3")).WithArgs(notification.UserID, 10, 0).WillReturnRows(notificationRows(notification))
 
 	if err := repo.CreateNotification(context.Background(), notification); err != nil {

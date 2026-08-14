@@ -39,7 +39,7 @@ func TestUserRepositoryCreateUser(t *testing.T) {
 	repo := NewUserRepository(db)
 	user := domains.NewUser("alex", "Alex Doe", "alex@example.com", "hashed")
 
-	mock.ExpectExec(regexp.QuoteMeta("INSERT INTO users (id,  username, name, email, hashed_password, profile_picture, is_active, email_verified) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)")).WithArgs(user.ID, user.Username, user.Name, user.Email, user.HashedPassword, user.ProfilePicture, user.IsActive, user.EmailVerified).WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectQuery(regexp.QuoteMeta("INSERT INTO users (id,  username, name, email, hashed_password, profile_picture, is_active, email_verified) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING created_at")).WithArgs(user.ID, user.Username, user.Name, user.Email, user.HashedPassword, user.ProfilePicture, user.IsActive, user.EmailVerified).WillReturnRows(sqlmock.NewRows([]string{"created_at"}).AddRow(time.Now().UTC()))
 
 	if err := repo.CreateUser(context.Background(), user); err != nil {
 		t.Fatalf("CreateUser returned error: %v", err)

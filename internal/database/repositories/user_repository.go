@@ -30,9 +30,10 @@ func NewUserRepository(db *sqlx.DB) UserRepository {
 }
 
 func (ur *userRepository) CreateUser(ctx context.Context, user *domains.User) error {
-	query := `INSERT INTO users (id,  username, name, email, hashed_password, profile_picture, is_active, email_verified) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
-	_, err := ur.db.ExecContext(
+	query := `INSERT INTO users (id,  username, name, email, hashed_password, profile_picture, is_active, email_verified) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING created_at`
+	err := ur.db.GetContext(
 		ctx,
+		&user.CreatedAt,
 		query,
 		user.ID,
 		user.Username,

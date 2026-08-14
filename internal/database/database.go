@@ -76,8 +76,8 @@ var createNotificationsTable = `CREATE TABLE IF NOT EXISTS notifications (
     message TEXT NOT NULL,          
     metadata JSONB,                   -- data extra según el tipo (ej: order_id)
     is_seen BOOLEAN DEFAULT FALSE,
-    seen_at TIMESTAMP,                
-    created_at TIMESTAMP DEFAULT NOW()
+    seen_at TIMESTAMPTZ,                
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 CREATE INDEX idx_notifications_user_unseen ON notifications(user_id, is_seen);
 `
@@ -85,7 +85,7 @@ CREATE INDEX idx_notifications_user_unseen ON notifications(user_id, is_seen);
 var createFavoritesTable = `CREATE TABLE IF NOT EXISTS favorites (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
     PRIMARY KEY (user_id, product_id)
 );
 `
