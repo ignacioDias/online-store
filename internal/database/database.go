@@ -2,43 +2,44 @@ package database
 
 import (
 	"fmt"
+	"sports-store/internal/database/repositories"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type Database struct {
 	DB                     *sqlx.DB
-	UserRepository         *UserRepository
-	SessionRepository      *SessionRepository
-	ProductRepository      *ProductRepository
-	NotificationRepository *NotificationRepository
-	ShoppingCartRepository *ShoppingCartRepository
-	FavoriteRepository     *FavoriteRepository
-	ReviewRepository       *ReviewRepository
-	InventoryRepository    *InventoryRepository
-	PaymentRepository      *PaymentRepository
-	CategoryRepository     *CategoryRepository
-	CouponRepository       *CouponRepository
-	AddressRepository      *AddressRepository
-	OrderRepository        *OrderRepository //orders and orderitems tables
+	UserRepository         repositories.UserRepository
+	SessionRepository      repositories.SessionRepository
+	ProductRepository      repositories.ProductRepository
+	NotificationRepository repositories.NotificationRepository
+	ShoppingCartRepository repositories.ShoppingCartRepository
+	FavoriteRepository     repositories.FavoriteRepository
+	ReviewRepository       repositories.ReviewRepository
+	InventoryRepository    repositories.InventoryRepository
+	PaymentRepository      repositories.PaymentRepository
+	CategoryRepository     repositories.CategoryRepository
+	CouponRepository       repositories.CouponRepository
+	AddressRepository      repositories.AddressRepository
+	OrderRepository        repositories.OrderRepository //orders and orderitems tables
 }
 
 func NewDatabase(db *sqlx.DB) *Database {
 	return &Database{
 		DB:                     db,
-		UserRepository:         NewUserRepository(db),
-		SessionRepository:      NewSessionRepository(db),
-		ProductRepository:      NewProductRepository(db),
-		NotificationRepository: NewNotificationRepository(db),
-		ShoppingCartRepository: NewShoppingCartRepository(db),
-		FavoriteRepository:     NewFavoriteRepository(db),
-		ReviewRepository:       NewReviewRepository(db),
-		InventoryRepository:    NewInventoryRepository(db),
-		PaymentRepository:      NewPaymentRepository(db),
-		CategoryRepository:     NewCategoryRepository(db),
-		CouponRepository:       NewCouponRepository(db),
-		AddressRepository:      NewAddressRepository(db),
-		OrderRepository:        NewOrderRepository(db),
+		UserRepository:         repositories.NewUserRepository(db),
+		SessionRepository:      repositories.NewSessionRepository(db),
+		ProductRepository:      repositories.NewProductRepository(db),
+		NotificationRepository: repositories.NewNotificationRepository(db),
+		ShoppingCartRepository: repositories.NewShoppingCartRepository(db),
+		FavoriteRepository:     repositories.NewFavoriteRepository(db),
+		ReviewRepository:       repositories.NewReviewRepository(db),
+		InventoryRepository:    repositories.NewInventoryRepository(db),
+		PaymentRepository:      repositories.NewPaymentRepository(db),
+		CategoryRepository:     repositories.NewCategoryRepository(db),
+		CouponRepository:       repositories.NewCouponRepository(db),
+		AddressRepository:      repositories.NewAddressRepository(db),
+		OrderRepository:        repositories.NewOrderRepository(db),
 	}
 }
 
@@ -79,6 +80,14 @@ var createNotificationsTable = `CREATE TABLE IF NOT EXISTS notifications (
     created_at TIMESTAMP DEFAULT NOW()
 );
 CREATE INDEX idx_notifications_user_unseen ON notifications(user_id, is_seen);
+`
+
+var createFavoritesTable = `CREATE TABLE IF NOT EXISTS favorites (
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (user_id, product_id)
+);
 `
 
 func (db *Database) Init() error {

@@ -42,7 +42,7 @@ func (sessRepo *sessionRepository) CreateSession(ctx context.Context, session *d
 
 func (sessRepo *sessionRepository) GetSessionByID(ctx context.Context, id string) (*domains.Session, error) {
 	var session domains.Session
-	query := "SELECT id, user_id, created_at, expires_at FROM sessions WHERE id = $1 AND expires_at > (CURRENT_TIMESTAMP AT TIME ZONE 'UTC')"
+	query := "SELECT id, user_id, created_at, expires_at FROM sessions WHERE id = $1 AND expires_at > NOW()"
 	if err := sessRepo.db.GetContext(ctx, &session, query, id); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrSessionNotFound
