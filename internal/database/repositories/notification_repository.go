@@ -27,23 +27,23 @@ func NewNotificationRepository(db *sqlx.DB) NotificationRepository {
 }
 
 func (nr *notificationRepository) CreateNotification(ctx context.Context, notification *domains.Notification) error {
-	query := `INSERT INTO notifications (id, user_id, type, title, message, metadata, is_read, seen_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+	query := `INSERT INTO notifications (id, user_id, type, title, message, metadata, is_seen, seen_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 	_, err := nr.db.ExecContext(ctx, query, notification.ID, notification.UserID, notification.Type, notification.Title, notification.Message, notification.Metadata, notification.IsSeen, notification.SeenAt)
 	if err != nil {
-		return err
+		return fmt.Errorf("insert notification: %w", err)
 	}
-	return fmt.Errorf("insert notification: %w", err)
+	return nil
 }
 
 func (nr *notificationRepository) GetNotificationsByUserID(ctx context.Context, userID string, limit, offset int) ([]*domains.Notification, error) {
-	query := `SELECT id, user_id, type, title, message, metadata, is_seen, seen_at FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3`
+	query := `SELECT id, user_id, type, title, message, metadata, is_seen, seen_at, created_at FROM notifications WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3`
 	var notifications []*domains.Notification
 	err := nr.db.SelectContext(ctx, &notifications, query, userID, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("select notifications: %w", err)
 	}
 	if len(notifications) == 0 {
-		return nil, ErrNotificationNotFound
+		return []*domains.Notification{}, errors.New("No notifications")
 	}
 
 	return notifications, nil

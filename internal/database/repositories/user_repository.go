@@ -50,17 +50,17 @@ func (ur *userRepository) CreateUser(ctx context.Context, user *domains.User) er
 }
 
 func (ur *userRepository) GetUserByID(ctx context.Context, id string) (*domains.User, error) {
-	query := `SELECT * FROM users WHERE id = $1`
+	query := `SELECT id, username, name, email, hashed_password, profile_picture, is_active, email_verified, created_at, updated_at FROM users WHERE id = $1`
 	return ur.getUser(ctx, query, id)
 }
 
 func (ur *userRepository) GetUserByEmail(ctx context.Context, email string) (*domains.User, error) {
-	query := `SELECT * FROM users WHERE email = $1`
+	query := `SELECT id, username, name, email, hashed_password, profile_picture, is_active, email_verified, created_at, updated_at FROM users WHERE email = $1`
 	return ur.getUser(ctx, query, email)
 }
 
 func (ur *userRepository) GetUserByUsername(ctx context.Context, username string) (*domains.User, error) {
-	query := `SELECT * FROM users WHERE username = $1`
+	query := `SELECT id, username, name, email, hashed_password, profile_picture, is_active, email_verified, created_at, updated_at FROM users WHERE username = $1`
 	return ur.getUser(ctx, query, username)
 }
 

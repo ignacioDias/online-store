@@ -36,6 +36,7 @@ func (sessRepo *sessionRepository) CreateSession(ctx context.Context, session *d
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
 	return stmt.GetContext(ctx, session, session)
 }
 
