@@ -32,7 +32,7 @@ func NewReviewRepository(db *sqlx.DB) ReviewRepository {
 func (rr *reviewRepository) CreateReview(ctx context.Context, review *domains.Review) error {
 	query := `INSERT INTO reviews (id, user_id, product_id, score, comment, image_url, likes, dislikes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT (user_id, product_id) DO NOTHING RETURNING created_at`
 
-	err := rr.db.QueryRowContext(ctx, query, review.ID, review.UserID, review.ProductID, review.Score, review.Comment, review.ImageURL, review.Likes, review.Dislikes).Scan(&review.CreatedAt)
+	err := rr.db.GetContext(ctx, &review.CreatedAt, query, review.ID, review.UserID, review.ProductID, review.Score, review.Comment, review.ImageURL, review.Likes, review.Dislikes)
 	if errors.Is(err, sql.ErrNoRows) {
 		return ErrReviewAlreadyExists
 	}
