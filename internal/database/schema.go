@@ -69,7 +69,7 @@ var createShoppingCartTable = `CREATE TABLE IF NOT EXISTS shopping_cart (
 );
 `
 var createAddressesTable = `CREATE TABLE IF NOT EXISTS addresses (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     street VARCHAR(255) NOT NULL,        -- "Av. Colón 1234"
     apartment VARCHAR(50),               -- "Piso 3, depto B" (opcional)
@@ -80,4 +80,7 @@ var createAddressesTable = `CREATE TABLE IF NOT EXISTS addresses (
     is_default BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+CREATE UNIQUE INDEX IF NOT EXISTS idx_addresses_one_default_per_user
+    ON addresses(user_id)
+    WHERE is_default = TRUE;
 `

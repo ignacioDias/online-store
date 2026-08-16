@@ -30,6 +30,7 @@ func NewCache(addr string) *Cache {
 func GenerateCacheKey(parts ...string) string {
 	h := sha256.New()
 	for _, p := range parts {
+		fmt.Fprintf(h, "%d:", len(p))
 		h.Write([]byte(p))
 	}
 	return fmt.Sprintf("%x", h.Sum(nil))
