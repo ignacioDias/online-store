@@ -84,3 +84,20 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_addresses_one_default_per_user
     ON addresses(user_id)
     WHERE is_default = TRUE;
 `
+
+var createPaymentsTable = `CREATE TABLE IF NOT EXISTS payments (
+    id UUID PRIMARY KEY,
+    order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    provider VARCHAR(50) NOT NULL,              -- 'mercadopago', 'stripe'
+    provider_payment_id VARCHAR(255) NOT NULL,  -- el ID que te devuelve el proveedor
+    status VARCHAR(50) NOT NULL,                -- 'pending', 'approved', 'rejected', 'refunded'
+    amount NUMERIC(10, 2) NOT NULL,
+    currency VARCHAR(3) NOT NULL DEFAULT 'ARS',
+    payment_method VARCHAR(50),                 -- 'credit_card', 'debit_card', 'cash', etc. (te lo da el proveedor)
+    metadata JSONB,                             -- data extra que te devuelva el proveedor
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    UNIQUE (provider, provider_payment_id)
+);
+`

@@ -30,11 +30,8 @@ func (r *addressRepository) CreateAddress(ctx context.Context, address *domains.
 	query := `INSERT INTO addresses (id, user_id, street, apartment, city, state, postal_code, country, is_default)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
 		RETURNING created_at`
-	err := r.db.GetContext(ctx, &address.CreatedAt, query, address.ID, address.UserID, address.Street, address.Apartment, address.City, address.State, address.PostalCode, address.Country, address.IsDefault)
-	if err != nil {
-		return err
-	}
-	return nil
+	return r.db.GetContext(ctx, &address.CreatedAt, query, address.ID, address.UserID, address.Street, address.Apartment, address.City, address.State, address.PostalCode, address.Country, address.IsDefault)
+
 }
 func (r *addressRepository) GetAddress(ctx context.Context, id string) (*domains.Address, error) {
 	query := `SELECT id, user_id, street, apartment, city, state, postal_code, country, is_default, created_at FROM addresses WHERE id = $1`
