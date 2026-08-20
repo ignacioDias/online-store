@@ -1,6 +1,10 @@
 package domains
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Category struct {
 	ID        string    `json:"id" db:"id"`
@@ -10,9 +14,9 @@ type Category struct {
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 }
 
-func NewCategory(id, name, slug string, parentID *string) *Category {
+func NewCategory(name, slug string, parentID *string) *Category {
 	return &Category{
-		ID:       id,
+		ID:       uuid.NewString(),
 		Name:     name,
 		Slug:     slug,
 		ParentID: parentID,

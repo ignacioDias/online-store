@@ -101,6 +101,16 @@ var createPaymentsTable = `CREATE TABLE IF NOT EXISTS payments (
     UNIQUE (provider, provider_payment_id)
 );
 `
+var createCategoriesTable = `
+CREATE TABLE IF NOT EXISTS categories (
+    id UUID PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(100) NOT NULL UNIQUE,     -- "zapatillas-running", para URLs amigables
+    parent_id UUID REFERENCES categories(id) ON DELETE CASCADE,  -- NULL = categoría raíz
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+`
+
 var createProductsTable = `
 CREATE TABLE IF NOT EXISTS products (
     id UUID PRIMARY KEY,
@@ -122,12 +132,21 @@ CREATE TABLE IF NOT EXISTS product_variants (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );`
 
-var createCategoriesTable = `
-CREATE TABLE IF NOT EXISTS categories (
+var createCouponsTable = `
+CREATE TABLE IF NOT EXISTS coupons (
     id UUID PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    slug VARCHAR(100) NOT NULL UNIQUE,     -- "zapatillas-running", para URLs amigables
-    parent_id UUID REFERENCES categories(id) ON DELETE CASCADE,  -- NULL = categoría raíz
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-`
+    code VARCHAR(50) NOT NULL UNIQUE,           -- "SAVE20", lo que tipea el usuario
+    discount_type VARCHAR(20) NOT NULL,          -- 'percentage' o 'fixed_amount'
+    discount_value NUMERIC(10, 2) NOT NULL,      -- 20 (=20%) o 500 (=$500)
+    min_purchase_amount NUMERIC(10, 2),          -- compra mínima para aplicar, opcional
+    max_discount_amount NUMERIC(10, 2),          -- tope del descuento (útil con %), opcional
+    usage_limit INT,                             -- cuántas veces se puede usar en total, NULL = ilimitado
+    usage_count INT NOT NULL DEFAULT 0,          -- cuántas veces ya se usó
+    usage_limit_per_user INT DEFAULT 1,          -- veces que un mismo usuario puede usarlo
+    starts_at TIMESTAMPTZ NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    CHECK (discount_type IN ('percentage', 'fixed_amount')),
+    CHECK (expires_at > starts_at)
+);`
