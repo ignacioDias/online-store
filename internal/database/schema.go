@@ -96,8 +96,38 @@ var createPaymentsTable = `CREATE TABLE IF NOT EXISTS payments (
     currency VARCHAR(3) NOT NULL DEFAULT 'ARS',
     payment_method VARCHAR(50),                 -- 'credit_card', 'debit_card', 'cash', etc. (te lo da el proveedor)
     metadata JSONB,                             -- data extra que te devuelva el proveedor
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
     UNIQUE (provider, provider_payment_id)
+);
+`
+var createProductsTable = `
+CREATE TABLE IF NOT EXISTS products (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    base_price NUMERIC(10, 2) NOT NULL,
+    category_id UUID REFERENCES categories(id),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS product_variants (
+    id UUID PRIMARY KEY,
+    product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    sku VARCHAR(100) NOT NULL UNIQUE,      -- código único de esta variante puntual
+    price NUMERIC(10, 2),                  -- NULL = usa base_price del producto; si tiene valor, lo sobreescribe
+    stock INT NOT NULL DEFAULT 0 CHECK (stock >= 0),
+    attributes JSONB NOT NULL,             -- {"talle": "42", "color": "negro"}
+    image_url TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);`
+
+var createCategoriesTable = `
+CREATE TABLE IF NOT EXISTS categories (
+    id UUID PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    slug VARCHAR(100) NOT NULL UNIQUE,     -- "zapatillas-running", para URLs amigables
+    parent_id UUID REFERENCES categories(id) ON DELETE CASCADE,  -- NULL = categoría raíz
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 `
