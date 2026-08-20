@@ -67,7 +67,7 @@ func (cr *couponRepository) GetCouponByCode(ctx context.Context, code string) (*
 }
 
 func (cr *couponRepository) UseCoupon(ctx context.Context, id string) error {
-	query := `UPDATE coupons SET usage_count = usage_count + 1 WHERE id = $1 AND usage_count < usage_limit`
+	query := `UPDATE coupons SET usage_count = usage_count + 1 WHERE id = $1 AND (usage_limit IS NULL OR usage_count < usage_limit)`
 	result, err := cr.db.ExecContext(ctx, query, id)
 	if err != nil {
 		return err
