@@ -1,6 +1,10 @@
 package domains
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type PaymentStatus string
 
@@ -23,8 +27,8 @@ type Payment struct {
 	Currency          string        `json:"currency" db:"currency"`                       // default: 'ARS'
 	PaymentMethod     *string       `json:"payment_method,omitempty" db:"payment_method"` // 'credit_card', 'debit_card', 'cash', etc. (te lo da el proveedor)
 	Metadata          *string       `json:"metadata,omitempty" db:"metadata"`             // data extra que te devuelva el proveedor
-	CreatedAt         string        `json:"created_at" db:"created_at"`
-	UpdatedAt         string        `json:"updated_at" db:"updated_at"`
+	CreatedAt         time.Time     `json:"created_at" db:"created_at"`
+	UpdatedAt         time.Time     `json:"updated_at" db:"updated_at"`
 }
 
 func NewPayment(orderID, userID, provider, providerPaymentID string, status PaymentStatus, amount float64, currency string, paymentMethod, metadata *string) *Payment {

@@ -10,7 +10,7 @@ import (
 
 type ShoppingCartRepository interface {
 	AddItemsToCart(ctx context.Context, item *domains.ShoppingCartItem) error
-	RemoveItemFromCart(ctx context.Context, userID, productID string) error
+	RemoveItemFromCart(ctx context.Context, userID, variantID string) error
 	UpdateItemQuantity(ctx context.Context, item *domains.ShoppingCartItem) error
 	GetCartItemsFromUser(ctx context.Context, userID string) ([]*domains.ShoppingCartItem, error)
 	ClearCart(ctx context.Context, userID string) error
@@ -27,25 +27,25 @@ func NewShoppingCartRepository(db *sqlx.DB) ShoppingCartRepository {
 }
 
 func (scr *shoppingCartRepository) AddItemsToCart(ctx context.Context, item *domains.ShoppingCartItem) error {
-	query := `INSERT INTO shopping_cart (user_id, product_id, quantity, added_at) VALUES ($1, $2, $3, NOW())`
-	_, err := scr.db.ExecContext(ctx, query, item.UserID, item.ProductID, item.Quantity)
+	query := `INSERT INTO shopping_cart (user_id, variant_id, quantity, added_at) VALUES ($1, $2, $3, NOW())`
+	_, err := scr.db.ExecContext(ctx, query, item.UserID, item.VariantID, item.Quantity)
 	return err
 }
 
-func (scr *shoppingCartRepository) RemoveItemFromCart(ctx context.Context, userID, productID string) error {
-	query := `DELETE FROM shopping_cart WHERE user_id = $1 AND product_id = $2`
-	result, err := scr.db.ExecContext(ctx, query, userID, productID)
+func (scr *shoppingCartRepository) RemoveItemFromCart(ctx context.Context, userID, variantID string) error {
+	query := `DELETE FROM shopping_cart WHERE user_id = $1 AND variant_id = $2`
+	result, err := scr.db.ExecContext(ctx, query, userID, variantID)
 	return CheckErrResult(result, err, ErrShoppingCartItemNotFound)
 }
 
 func (scr *shoppingCartRepository) UpdateItemQuantity(ctx context.Context, item *domains.ShoppingCartItem) error {
-	query := `UPDATE shopping_cart SET quantity = $1, added_at = NOW() WHERE user_id = $2 AND product_id = $3`
-	result, err := scr.db.ExecContext(ctx, query, item.Quantity, item.UserID, item.ProductID)
+	query := `UPDATE shopping_cart SET quantity = $1, added_at = NOW() WHERE user_id = $2 AND variant_id = $3`
+	result, err := scr.db.ExecContext(ctx, query, item.Quantity, item.UserID, item.VariantID)
 	return CheckErrResult(result, err, ErrShoppingCartItemNotFound)
 }
 
 func (scr *shoppingCartRepository) GetCartItemsFromUser(ctx context.Context, userID string) ([]*domains.ShoppingCartItem, error) {
-	query := `SELECT user_id, product_id, quantity, added_at FROM shopping_cart WHERE user_id = $1`
+	query := `SELECT user_id, variant_id, quantity, added_at FROM shopping_cart WHERE user_id = $1`
 	var items []*domains.ShoppingCartItem
 	err := scr.db.SelectContext(ctx, &items, query, userID)
 	if err != nil {

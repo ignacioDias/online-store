@@ -1,0 +1,22 @@
+Critical
+- The project does not compile:
+- Product, inventory, and order repositories are undefined.
+- createOrdersTable and createOrderItemsTable are undefined.
+- cmd/sports-store/main.go:3 does nothing, so the application never starts.
+- cmd/cli/cli.go:3 does nothing.
+- internal/router/router.go:20 registers no routes.
+High
+- internal/database/repositories/payment_repository.go:34 has invalid SQL: RETURNING updated_at created_at needs a comma.
+- Payment queries omit order_id from paymentColumns, so loaded payments lose their order ID.
+- domains.Payment uses string timestamps while the database uses TIMESTAMPTZ; use time.Time.
+- Coupon usage does not check is_active, starts_at, or expires_at.
+- usage_limit_per_user is declared but cannot be enforced because coupon usage has no user ID or usage-tracking table.
+- Repository methods for addresses, notifications, payments, and reviews operate by object ID alone. If handlers expose these directly, users could access or modify other users’ records.
+Medium
+- Sessions are stored as plaintext tokens. Hash session IDs before storing them.
+- Redis credentials and TLS are hardcoded/insecure in internal/cache/cache.go:18-23.
+- Category parent_id permits self-references and cycles.
+- Default-address updates are not transactional and can fail when another address is already default.
+- Cart, favorite, and notification list methods return “not found” for normal empty lists.
+- Review likes/dislikes can be directly manipulated and have no per-user voting protection.
+- Inventory/order ID types are inconsistent.

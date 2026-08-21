@@ -59,18 +59,20 @@ func (db *Database) Init() error {
 	}{
 		{name: "users", ddl: createUsersTable},
 		{name: "sessions", ddl: createSessionsTable},
+		{name: "categories", ddl: createCategoriesTable},
 		{name: "products", ddl: createProductsTable},
 		{name: "notifications", ddl: createNotificationsTable},
 		{name: "shopping_cart", ddl: createShoppingCartTable},
 		{name: "favorites", ddl: createFavoritesTable},
 		{name: "reviews", ddl: createReviewsTable},
-		{name: "inventory", ddl: createInventoryTable},
-		{name: "payments", ddl: createPaymentsTable},
-		{name: "categories", ddl: createCategoriesTable},
 		{name: "coupons", ddl: createCouponsTable},
 		{name: "addresses", ddl: createAddressesTable},
 		{name: "orders", ddl: createOrdersTable},
 		{name: "order_items", ddl: createOrderItemsTable},
+		{name: "coupon_usages", ddl: createCouponUsagesTable},
+		{name: "payments", ddl: createPaymentsTable},
+		{name: "inventory", ddl: createInventoryTable},
+		{name: "review_votes", ddl: createReviewVotesTable},
 	}
 
 	for _, tableStmt := range tableStatements {

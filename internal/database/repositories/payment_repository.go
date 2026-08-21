@@ -24,14 +24,14 @@ type paymentRepository struct {
 
 var ErrPaymentNotFound = errors.New("Payment not found")
 
-const paymentColumns = `id, user_id, provider, provider_payment_id, status, amount, currency, payment_method, metadata, created_at, updated_at`
+const paymentColumns = `id, order_id, user_id, provider, provider_payment_id, status, amount, currency, payment_method, metadata, created_at, updated_at`
 
 func NewPaymentRepository(db *sqlx.DB) PaymentRepository {
 	return &paymentRepository{db: db}
 }
 
 func (p *paymentRepository) CreatePayment(ctx context.Context, payment *domains.Payment) error {
-	query := `INSERT INTO payments (id, order_id, user_id, provider, provider_payment_id, status, amount, currency, payment_method, metadata) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING updated_at created_at`
+	query := `INSERT INTO payments (id, order_id, user_id, provider, provider_payment_id, status, amount, currency, payment_method, metadata) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING updated_at, created_at`
 	return p.db.QueryRowContext(ctx, query, payment.ID, payment.OrderID, payment.UserID, payment.Provider, payment.ProviderPaymentID, payment.Status, payment.Amount, payment.Currency, payment.PaymentMethod, payment.Metadata).Scan(&payment.UpdatedAt, &payment.CreatedAt)
 }
 
